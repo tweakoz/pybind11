@@ -56,11 +56,7 @@ if(PYTHONLIBS_FOUND AND PYTHON_MODULE_EXTENSION)
 endif()
 
 # Use the Python interpreter to find the libs.
-if(PythonLibsNew_FIND_REQUIRED)
-    find_package(PythonInterp ${PythonLibsNew_FIND_VERSION} REQUIRED)
-else()
-    find_package(PythonInterp ${PythonLibsNew_FIND_VERSION})
-endif()
+find_package (Python COMPONENTS Interpreter Development)
 
 if(NOT PYTHONINTERP_FOUND)
     set(PYTHONLIBS_FOUND FALSE)
