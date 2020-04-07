@@ -57,7 +57,7 @@ endif()
 
 # Use the Python interpreter to find the libs.
 find_package (Python COMPONENTS Interpreter Development)
-message( "PYTHON_EXECUTABLE: ${Python_EXECUTABLE}")
+#message( "PYTHON_EXECUTABLE: ${Python_EXECUTABLE}")
 set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
 set(PYTHON_FOUND ${Python_FOUND})
 set(PYTHON_LIBRARIES ${Python_LIBRARIES})
