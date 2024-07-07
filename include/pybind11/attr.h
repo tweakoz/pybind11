@@ -114,6 +114,10 @@ struct module_local {
     const bool value;
     constexpr explicit module_local(bool v = true) : value(v) {}
 };
+struct interp_local { // TOZ
+    const bool value;
+    constexpr explicit interp_local(bool v = true) : value(v) {}
+};
 
 /// Annotation to mark enums as an arithmetic type
 struct arithmetic {};
@@ -272,7 +276,7 @@ struct function_record {
 struct type_record {
     PYBIND11_NOINLINE type_record()
         : multiple_inheritance(false), dynamic_attr(false), buffer_protocol(false),
-          default_holder(true), module_local(false), is_final(false) {}
+          default_holder(true), module_local(false), interp_local(false), is_final(false) {}
 
     /// Handle to the parent scope
     handle scope;
@@ -327,6 +331,8 @@ struct type_record {
 
     /// Is the class definition local to the module shared object?
     bool module_local : 1;
+
+    bool interp_local : 1; // TOZ
 
     /// Is the class inheritable from python classes?
     bool is_final : 1;
@@ -601,6 +607,11 @@ struct process_attribute<metaclass> : process_attribute_default<metaclass> {
 template <>
 struct process_attribute<module_local> : process_attribute_default<module_local> {
     static void init(const module_local &l, type_record *r) { r->module_local = l.value; }
+};
+
+template <> // TOZ
+struct process_attribute<interp_local> : process_attribute_default<interp_local> {
+    static void init(const interp_local &l, type_record *r) { r->interp_local = l.value; }
 };
 
 /// Process a 'prepend' attribute, putting this at the beginning of the overload chain

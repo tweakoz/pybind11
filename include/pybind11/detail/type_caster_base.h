@@ -704,6 +704,30 @@ public:
         return false;
     }
 
+    /// Try to load with foreign typeinfo, if available. Used when there is no
+    /// native typeinfo, or when the native one wasn't able to produce a value.
+    PYBIND11_NOINLINE bool try_load_foreign_module_interp(handle src) {
+        assert(False); // TOZ
+        constexpr auto *local_key = PYBIND11_INTERP_LOCAL_ID;
+        const auto pytype = type::handle_of(src);
+        if (!hasattr(pytype, local_key)) {
+            return false;
+        }
+
+        type_info *foreign_typeinfo = reinterpret_borrow<capsule>(getattr(pytype, local_key));
+        // Only consider this foreign loader if actually foreign and is a loader of the correct cpp
+        // type
+        if (foreign_typeinfo->module_local_load == &local_load
+            || (cpptype && !same_type(*cpptype, *foreign_typeinfo->cpptype))) {
+            return false;
+        }
+
+        if (auto *result = foreign_typeinfo->module_local_load(src.ptr(), foreign_typeinfo)) {
+            value = result;
+            return true;
+        }
+        return false;
+    }
     // Implementation of `load`; this takes the type of `this` so that it can dispatch the relevant
     // bits of code between here and copyable_holder_caster where the two classes need different
     // logic (without having to resort to virtual inheritance).

@@ -236,6 +236,7 @@ struct type_info {
     buffer_info *(*get_buffer)(PyObject *, void *) = nullptr;
     void *get_buffer_data = nullptr;
     void *(*module_local_load)(PyObject *, const type_info *) = nullptr;
+    void *(*interp_local_load)(PyObject *, const type_info *) = nullptr; // TOZ
     /* A simple type never occurs as a (direct or indirect) parent
      * of a class that makes use of multiple inheritance.
      * A type can be simple even if it has non-simple ancestors as long as it has no descendants.
@@ -247,6 +248,8 @@ struct type_info {
     bool default_holder : 1;
     /* true if this is a type registered with py::module_local */
     bool module_local : 1;
+    /* true if this is a type registered with py::interp_local */
+    bool interp_local : 1; // TOZ
 };
 
 /// On MSVC, debug and release builds are not ABI-compatible!
@@ -313,6 +316,12 @@ struct type_info {
 
 #define PYBIND11_MODULE_LOCAL_ID                                                                  \
     "__pybind11_module_local_v" PYBIND11_TOSTRING(PYBIND11_INTERNALS_VERSION)                     \
+        PYBIND11_INTERNALS_KIND PYBIND11_COMPILER_TYPE PYBIND11_STDLIB                            \
+            PYBIND11_BUILD_ABI PYBIND11_BUILD_TYPE "__"
+
+// TOZ
+#define PYBIND11_INTERP_LOCAL_ID                                                                  \
+    "__pybind11_interp_local_v" PYBIND11_TOSTRING(PYBIND11_INTERNALS_VERSION)                     \
         PYBIND11_INTERNALS_KIND PYBIND11_COMPILER_TYPE PYBIND11_STDLIB                            \
             PYBIND11_BUILD_ABI PYBIND11_BUILD_TYPE "__"
 

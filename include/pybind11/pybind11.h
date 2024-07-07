@@ -1451,6 +1451,11 @@ protected:
             tinfo->module_local_load = &type_caster_generic::local_load;
             setattr(m_ptr, PYBIND11_MODULE_LOCAL_ID, capsule(tinfo));
         }
+        if (rec.interp_local) {
+            // Stash the local typeinfo and loader so that external modules can access it.
+            tinfo->interp_local_load = &type_caster_generic::local_load;
+            setattr(m_ptr, PYBIND11_INTERP_LOCAL_ID, capsule(tinfo));
+        }
     }
 
     /// Helper function which tags all parents of a type using mult. inheritance
@@ -1646,10 +1651,19 @@ public:
 
         if (has_alias) {
             with_internals([&](internals &internals) {
-                auto &instances = record.module_local ? get_local_internals().registered_types_cpp
-                                                      : internals.registered_types_cpp;
-                instances[std::type_index(typeid(type_alias))]
-                    = instances[std::type_index(typeid(type))];
+                type_map<type_info *>* instances = nullptr;
+                if(record.interp_local) {
+                    // TOZ
+                    assert(false);
+                    instances = &get_local_internals().registered_types_cpp;
+                }
+                else if(record.module_local) {
+                    instances = &get_local_internals().registered_types_cpp;
+                } else {
+                    instances = &internals.registered_types_cpp;
+                }
+                (*instances)[std::type_index(typeid(type_alias))]
+                    = (*instances)[std::type_index(typeid(type))];
             });
         }
     }

@@ -253,6 +253,7 @@ inline void finalize_interpreter() {
     // avoid undefined behaviors when initializing another interpreter
     detail::get_local_internals().registered_types_cpp.clear();
     detail::get_local_internals().registered_exception_translators.clear();
+    // TOZ
 
     Py_Finalize();
 
